@@ -1,5 +1,5 @@
 {
-  :source-paths ["src" "cli"]
+  :source-paths ["src" "data" "cli"]
   :cache-blockers #{cumulo-util.build}
   :dependencies [
     [mvc-works/hsl "0.1.2"]
@@ -13,7 +13,7 @@
     [respo/reel "0.3.5"]
     [cumulo/util "0.1.10"]
     [medley "1.2.0"]
-    [appliedscience/js-interop "0.1.22"]
+    [appliedscience/js-interop "0.2.4"]
     [org.clojure/core.incubator "0.1.4"]
   ]
   ; :repositories {

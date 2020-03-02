@@ -8,26 +8,21 @@
             [respo.comp.space :refer [=<]]
             [reel.comp.reel :refer [comp-reel]]
             [respo-md.comp.md :refer [comp-md]]
-            [app.config :refer [dev?]]))
+            [app.config :refer [dev?]]
+            [app.comp.expr :refer [comp-expr-horizontal]]
+            [shadow.resource :refer [inline]]
+            [cljs.reader :refer [read-string]]))
 
 (defcomp
  comp-container
  (reel)
  (let [store (:store reel), states (:states store)]
    (div
-    {:style (merge ui/global ui/row)}
-    (textarea
-     {:value (:content store),
-      :placeholder "Content",
-      :style (merge ui/expand ui/textarea {:height 320}),
-      :on-input (fn [e d! m!] (d! :content (:value e)))})
-    (=< "8px" nil)
-    (div
-     {:style ui/expand}
-     (comp-md "This is some content with `code`")
-     (=< "8px" nil)
-     (button
-      {:style ui/button,
-       :inner-text (str "run"),
-       :on-click (fn [e d! m!] (println (:content store)))}))
+    {:style (merge ui/global {:color (hsl 0 0 100), :padding 16})}
+    (div {} (comp-expr-horizontal (read-string (inline "page-demo.edn"))))
+    (=< nil 200)
+    (comp-expr-horizontal (read-string (inline "updater-demo.edn")))
+    (=< nil 200)
+    (comp-expr-horizontal (read-string (inline "bookmark-demo.edn")))
+    (=< nil 200)
     (when dev? (cursor-> :reel comp-reel states reel {})))))
