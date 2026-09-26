@@ -1,4 +1,4 @@
-{} (:calcit-version |0.18.1) (:version |0.0.2)
+{} (:calcit-version |0.22.0-alpha.3) (:version |0.0.3)
   :dependencies $ {}
     |calcit-lang/lilac |0.5.9
     |calcit-lang/memof |0.0.33
