@@ -3,7 +3,7 @@
   :about "|Machine-generated snapshot. Do not edit directly — changes will be overwritten. Use `calcit query` to inspect and `calcit edit`/`calcit tree` to modify. Run `calcit docs agents --contract` before mutations; use `--full` for first orientation or changed contract digest. Manual edits must follow format and schema conventions, then run `calcit edit format`."
   :package |app
   :entries $ {} $ :default
-    {} (:description |) (:init-fn 'app.main/main!) (:mode :native) (:reload-fn 'app.main/reload!)
+    {} (:description |) (:init-fn 'app.main/main!) (:mode :native) (:reload-fn 'app.main/reload!) (:target :browser)
       :feature-policy $ {}
       :modules $ [] |respo.calcit/ |lilac/ |memof/ |respo-ui.calcit/ |respo-markdown.calcit/ |reel.calcit/
       :type-slots $ {}
@@ -13,11 +13,11 @@
         'comp-container $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-container (reel)
             let
-                store $ decode-map-as
+                store $ assert-type
                   match (get reel :store)
                     (:some data) data
-                    (:none) ({})
-                  , app.schema/Store
+                    (:none) app.schema/store
+                  , 'app.schema/Store
                 states $ :states store
               div
                 {} $ :style $ merge ui/global
@@ -171,34 +171,29 @@
             render-app!
             add-watch *reel :changes $ fn (reel prev) (render-app!)
             listen-devtools! |k dispatch!
-            .?!addEventListener js/window |beforeunload $ fn (event) (persist-storage!)
+            browser/add-event-listener! |beforeunload $ fn (event) (persist-storage!)
             repeat! 60 persist-storage!
             let
-                raw $ .?!getItem js/localStorage $
-                  get config/site :storage-key
-                  , .unwrap-or |hv-layout
-              when (js-present? raw)
-                dispatch! $ :: :hydrate-storage $ parse-cirru-edn (unsafe-coerce raw String)
+                raw $ browser/storage-get $ option:unwrap-or (get config/site :storage-key) |hv-layout
+              when (option:some? raw)
+                dispatch! $ :: :hydrate-storage $ parse-cirru-edn (option:unwrap raw)
             println "|App started."
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ []
             :features $ #{} :js-ffi
         'mount-target $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ def mount-target (.querySelector js/document |.app)
+          :code $ quote $ def mount-target
+            option:unwrap $ browser/query-selector |.app
           :examples $ []
-          :schema $ :: 'JsObject
+          :schema $ :: 'js-ffi.browser/DomElementHost
         'persist-storage! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn persist-storage! ()
-            do
-              .?!setItem js/localStorage
-                (get config/site :storage-key) .unwrap-or |hv-layout
-                format-cirru-edn $ decode-map-as
-                  match (get @*reel :store)
-                    (:some data) data
-                    (:none) ({})
-                  , Store
-              , &unit
+            browser/storage-set!
+              option:unwrap-or (get config/site :storage-key) |hv-layout
+              format-cirru-edn $ match (get @*reel :store)
+                (:some data) data
+                (:none) store
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ []
@@ -224,12 +219,10 @@
             :features $ #{} :js-ffi
         'repeat! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn repeat! (duration cb)
-            do
-              js/setTimeout
-                fn () (cb)
-                  repeat! (* 1000 duration) cb
-                * 1000 duration
-              , &unit
+            browser/set-timeout!
+              fn () (cb) (repeat! duration cb)
+              * 1000 duration
+            , &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ [] 'Number $ :: 'Fn
@@ -249,6 +242,7 @@
             app.config :as config
             |./calcit.build-errors :default build-errors
             |bottom-tip :default hud!
+            js-ffi.browser :as browser
     'app.schema $ %{} 'FileEntry
       :defs $ {}
         'Store $ %{} 'CodeEntry (:doc |)
@@ -270,11 +264,22 @@
               (:states cursor s)
                 decode-map-as (update-states store cursor s) app.schema/Store
               (:content data) (assoc store :content data)
-              (:hydrate-storage data) (decode-map-as data app.schema/Store)
+              (:hydrate-storage data) (assert-type data 'app.schema/Store)
               _ $ do (println "|unknown op:" op) store
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'app.schema/Store)
             :args $ [] 'app.schema/Store 'Enum 'String 'Number
+          :tests $ [] $ %{} 'TestEntry (:name |hydrates-stored-content)
+            :code $ quote $ is=
+              app.schema/Store :states ({}) :content |restored
+              updater
+                app.schema/Store :states ({}) :content |old
+                :: :hydrate-storage $ parse-cirru-edn $ format-cirru-edn
+                  app.schema/Store :states ({}) :content |restored
+                , |test 0
+            :tags $ #{} :storage :unit
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.updater
-          :require $ [] respo.cursor :refer $ [] update-states
+          :require
+            [] respo.cursor :refer $ [] update-states
+            calcit.test :refer $ is=
