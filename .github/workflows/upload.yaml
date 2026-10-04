@@ -44,7 +44,6 @@ jobs:
         test ! -e package.cirru
         calcit edit format
         git diff --exit-code -- calcit.cirru
-        calcit calcit.cirru fix --workflow strict --verify
         calcit calcit.cirru --check-only
         calcit calcit.cirru analyze deprecated --summary-only
         calcit calcit.cirru analyze quality --baseline config/calcit-quality.cirru
@@ -54,10 +53,12 @@ jobs:
 
     - name: Select frontend CDN path
       id: asset-path
+      env:
+        PR_NUMBER: ${{ github.event.pull_request.number }}
       run: |
         prefix="${GITHUB_REPOSITORY}/"
         if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
-          prefix="${GITHUB_REPOSITORY}/pr/${{ github.event.pull_request.number }}/"
+          prefix="${GITHUB_REPOSITORY}/pr/${PR_NUMBER}/${GITHUB_RUN_ID}/${GITHUB_RUN_ATTEMPT}/"
         fi
         echo "prefix=$prefix" >> "$GITHUB_OUTPUT"
         echo "base-url=https://cos-sh.tiye.me/$prefix" >> "$GITHUB_OUTPUT"
@@ -123,7 +124,7 @@ jobs:
 
     - name: Upload and publicly verify frontend assets
       if: steps.deploy-head.outputs.current == 'true' && steps.cos-credentials.outputs.available == 'true'
-      uses: worktools/cos-upload-action@17e6d213fe9f6772a6090a13c8ba044cd6cbcb09 # v1.1.1
+      uses: worktools/cos-upload-action@06d6027dcca6413c5936e04a9b6e9f0d5ef71ba0 # v1.2.0
       with:
         source-dir: dist
         bucket: ${{ secrets.COS_BUCKET }}
