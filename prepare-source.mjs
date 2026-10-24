@@ -25,9 +25,19 @@ for(const [id,path] of [['app.comp.container/comp-container','@3.2.1.1.1.0'],['a
   for(const i of indices.slice(0,-1))node=node[i];assert.equal(node[indices.at(-1)],'merge');node[indices.at(-1)]='.merge';
   ops.push(['tree','replace',id,'--path',path,'--input-format','cirru','--code','quote .merge','--expect','quote merge']);
 }
+const tested=expected.find(d=>d.id==='app.updater/updater');
+const test=tested.tests.find(t=>t.name==='updates-state-subtree-without-nesting-store');
+assert.deepEqual(test.tags,['regression','unit']);let testChanges=0;
+function migrateTest(node){
+  if(!Array.isArray(node))return;
+  if(node[0]==='option:unwrap'){assert.equal(node.length,2);node[0]='.unwrap';testChanges++;}
+  node.forEach(migrateTest);
+}
+migrateTest(test.code);assert.equal(testChanges,3);
+ops.push(['edit','add-test',tested.id,test.name,'--tags',test.tags.join(','),'--overwrite','--input-format','json-ast','--code',JSON.stringify(test.code)]);
 writeFileSync('acceptance/before.json',JSON.stringify(before,null,2));writeFileSync('acceptance/operations.json',JSON.stringify(ops,null,2));
 const args=['edit','transaction','--file','acceptance/operations.json','--format','json'];const preview=JSON.parse(run(...args,'--dry-run'));assert.ok(preview.scoped_revision);
 writeFileSync('acceptance/preview.json',JSON.stringify(preview,null,2));writeFileSync('acceptance/applied.json',run(...args,'--expect-revision',preview.scoped_revision));
 assert.deepEqual(inventory(),expected);assert.deepEqual(q('config'),config);
 writeFileSync('acceptance/after.json',JSON.stringify(expected,null,2));writeFileSync('acceptance/snapshot-blob.txt',execFileSync('git',['hash-object','calcit.cirru'],{encoding:'utf8'}));
-console.log('25 full views guarded: only 3 Map merge heads changed; 3 attached tests, schema, HUD, FFI and config preserved');
+console.log('25 full views guarded: 3 Map merge and 3 attached Option unwrap heads changed; original 3 test names/tags/assertions, schema, HUD, FFI and config preserved');

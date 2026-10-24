@@ -48,7 +48,11 @@ jobs:
         calcit edit format
         test "$(git hash-object calcit.cirru)" = "$(cat acceptance/snapshot-blob.txt)"
         calcit calcit.cirru --check-only --all-defs
-        calcit fix --workflow strict --verify --format json | jq -e '.data.workflow.status? == "passed" and .diagnostics? == []'
+        strict_exit=0
+        calcit fix --workflow strict --verify --format json > acceptance/strict.json || strict_exit=$?
+        cat acceptance/strict.json
+        test "$strict_exit" -eq 0
+        jq -e '.data.workflow.status? == "passed" and .diagnostics? == []' acceptance/strict.json
         calcit calcit.cirru analyze quality --baseline config/calcit-quality.cirru
         calcit calcit.cirru --check-only --ns app.main --ns app.comp.container --ns app.comp.expr --ns app.updater --ns app.config --ns app.schema --summary-only
         calcit calcit.cirru test --require-match
@@ -79,6 +83,7 @@ jobs:
         retention-days: 90
 
     - name: Preserve official source preparation evidence
+      if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: hv-tree-source-prepared
