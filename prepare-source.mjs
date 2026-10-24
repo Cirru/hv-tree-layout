@@ -43,9 +43,14 @@ const initializer=['typed/State',':base','store',':store','store',':records',['[
 const reelShown=JSON.parse(run('tree','show',reel.id,'--path','@2','--format','json'));assert.deepEqual(reelShown.tree,oldInitializer);
 reel.code[2]=initializer;
 ops.push(['tree','replace',reel.id,'--path','@2','--input-format','json-ast','--code',JSON.stringify(initializer),'--expect',"quote (assert-type (typed/new-reel store) (:: 'reel.typed/State 'app.schema/Op 'app.schema/Store))"]);
+const renderer=expected.find(d=>d.id==='app.main/render-app!');
+assert.equal(renderer.code[3][3],'dispatch!');
+const adapter=['fn',['op'],['hint-fn',['{}',[':args',['[]',"'Dynamic"]],[':return',"'Unit"]]],['if',['enum?','op'],['dispatch!','op'],['raise','|Expected a layout operation enum']]];
+renderer.code[3][3]=adapter;
+ops.push(['tree','replace',renderer.id,'--path','@3.3','--input-format','json-ast','--code',JSON.stringify(adapter),'--expect','quote dispatch!']);
 writeFileSync('acceptance/before.json',JSON.stringify(before,null,2));writeFileSync('acceptance/operations.json',JSON.stringify(ops,null,2));
 const args=['edit','transaction','--file','acceptance/operations.json','--format','json'];const preview=JSON.parse(run(...args,'--dry-run'));assert.ok(preview.scoped_revision);
 writeFileSync('acceptance/preview.json',JSON.stringify(preview,null,2));writeFileSync('acceptance/applied.json',run(...args,'--expect-revision',preview.scoped_revision));
 assert.deepEqual(inventory(),expected);assert.deepEqual(q('config'),config);
 writeFileSync('acceptance/after.json',JSON.stringify(expected,null,2));writeFileSync('acceptance/snapshot-blob.txt',execFileSync('git',['hash-object','calcit.cirru'],{encoding:'utf8'}));
-console.log('25 full views guarded: 3 Map merge, 3 attached Option unwrap, and one empty typed State initializer; original 3 test names/tags/assertions, schema, HUD, FFI and config preserved');
+console.log('25 full views guarded: 3 Map merge, 3 attached Option unwrap, empty typed State initializer and checked Dynamic render adapter; original 3 test names/tags/assertions, root schema, HUD, FFI and config preserved');
