@@ -1,0 +1,2059 @@
+[
+  {
+    "code": [
+      "def",
+      "calcit-dirname",
+      "|"
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.$meta/calcit-dirname",
+    "js_ffi": null,
+    "schema": null,
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "def",
+      "calcit-filename",
+      "|calcit.cirru"
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.$meta/calcit-filename",
+    "js_ffi": null,
+    "schema": null,
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defcomp",
+      "comp-container",
+      [
+        "reel"
+      ],
+      [
+        "let",
+        [
+          [
+            "store",
+            [
+              ":store",
+              "reel"
+            ]
+          ],
+          [
+            "states",
+            [
+              ":states",
+              "store"
+            ]
+          ]
+        ],
+        [
+          "div",
+          [
+            "{}",
+            [
+              ":style",
+              [
+                "merge",
+                "ui/global",
+                [
+                  "{}",
+                  [
+                    ":color",
+                    [
+                      "hsl",
+                      "0",
+                      "0",
+                      "100"
+                    ]
+                  ],
+                  [
+                    ":padding",
+                    "16"
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "div",
+            [
+              "{}"
+            ],
+            [
+              "comp-expr-horizontal",
+              [
+                "parse-cirru-list",
+                [
+                  "inline",
+                  "|page-demo.cirru"
+                ]
+              ]
+            ]
+          ],
+          [
+            "=<",
+            "nil",
+            "200"
+          ],
+          [
+            "comp-expr-horizontal",
+            [
+              "parse-cirru-list",
+              [
+                "inline",
+                "|updater-demo.cirru"
+              ]
+            ]
+          ],
+          [
+            "=<",
+            "nil",
+            "200"
+          ],
+          [
+            "comp-expr-horizontal",
+            [
+              "parse-cirru-list",
+              [
+                "inline",
+                "|bookmark-demo.cirru"
+              ]
+            ]
+          ],
+          [
+            "=<",
+            "nil",
+            "200"
+          ],
+          [
+            "when",
+            "dev?",
+            [
+              "comp-typed-reel",
+              [
+                ">>",
+                "states",
+                ":reel"
+              ],
+              "reel",
+              [
+                "{}"
+              ]
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.comp.container/comp-container",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'respo.schema/Component"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          [
+            "::",
+            "'reel.typed/State",
+            "'app.schema/Op",
+            "'app.schema/Store"
+          ]
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defmacro",
+      "inline",
+      [
+        "path"
+      ],
+      [
+        "read-file",
+        [
+          "str",
+          "|data/",
+          "path"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.comp.container/inline",
+    "js_ffi": null,
+    "schema": [
+      "::",
+      "'Macro",
+      [
+        "{}",
+        [
+          ":capabilities",
+          [
+            "#{}",
+            ":fs-read"
+          ]
+        ],
+        [
+          ":expansion",
+          [
+            "::",
+            "'Expr",
+            "'String"
+          ]
+        ],
+        [
+          ":required",
+          [
+            "[]",
+            [
+              "::",
+              "'Expr",
+              "'String"
+            ]
+          ]
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defcomp",
+      "comp-empty",
+      [],
+      [
+        "div",
+        [
+          "{}",
+          [
+            ":style",
+            [
+              "{}",
+              [
+                ":width",
+                "12"
+              ],
+              [
+                ":height",
+                "12"
+              ],
+              [
+                ":margin",
+                "12"
+              ],
+              [
+                ":border",
+                [
+                  "str",
+                  "|1px solid ",
+                  [
+                    "hsl",
+                    "0",
+                    "0",
+                    "100"
+                  ]
+                ]
+              ],
+              [
+                ":border-radius",
+                "|8px"
+              ]
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.comp.expr/comp-empty",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'respo.schema/Component"
+      ],
+      [
+        ":args",
+        [
+          "[]"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defcomp",
+      "comp-expr-horizontal",
+      [
+        "expr"
+      ],
+      [
+        "list->",
+        [
+          "{}",
+          [
+            ":style",
+            [
+              "merge",
+              "ui/row",
+              [
+                "if",
+                [
+                  "list?",
+                  [
+                    [
+                      "first",
+                      "expr"
+                    ],
+                    ".unwrap-or",
+                    "|"
+                  ]
+                ],
+                [
+                  "{}",
+                  [
+                    ":font-family",
+                    "ui/font-code"
+                  ],
+                  [
+                    ":padding-left",
+                    "32"
+                  ],
+                  [
+                    ":border-top",
+                    [
+                      "str",
+                      "|1px solid ",
+                      [
+                        "hsl",
+                        "0",
+                        "0",
+                        "20"
+                      ]
+                    ]
+                  ],
+                  [
+                    ":padding-top",
+                    "4"
+                  ]
+                ],
+                [
+                  "{}",
+                  [
+                    ":font-family",
+                    "ui/font-code"
+                  ],
+                  [
+                    ":border-top",
+                    [
+                      "str",
+                      "|1px solid ",
+                      [
+                        "hsl",
+                        "0",
+                        "0",
+                        "20"
+                      ]
+                    ]
+                  ],
+                  [
+                    ":padding-top",
+                    "4"
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ],
+        [
+          "->",
+          "expr",
+          [
+            "map-indexed",
+            [
+              "fn",
+              [
+                "idx",
+                "child"
+              ],
+              [
+                "[]",
+                "idx",
+                [
+                  "cond",
+                  [
+                    [
+                      "string?",
+                      "child"
+                    ],
+                    [
+                      "div",
+                      [
+                        "{}"
+                      ],
+                      [
+                        "comp-leaf",
+                        "child"
+                      ]
+                    ]
+                  ],
+                  [
+                    [
+                      "list?",
+                      "child"
+                    ],
+                    [
+                      "if",
+                      [
+                        "empty?",
+                        "child"
+                      ],
+                      [
+                        "comp-empty"
+                      ],
+                      [
+                        "comp-expr-vertical",
+                        "child"
+                      ]
+                    ]
+                  ],
+                  [
+                    "true",
+                    [
+                      "comp-leaf",
+                      [
+                        "str",
+                        "child"
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.comp.expr/comp-expr-horizontal",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'respo.schema/Component"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          [
+            "::",
+            "'List",
+            "'Dynamic"
+          ]
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defcomp",
+      "comp-expr-vertical",
+      [
+        "expr"
+      ],
+      [
+        "list->",
+        [
+          "{}",
+          [
+            ":style",
+            [
+              "merge",
+              "ui/column",
+              [
+                "if",
+                [
+                  "list?",
+                  [
+                    [
+                      "first",
+                      "expr"
+                    ],
+                    ".unwrap-or",
+                    "|"
+                  ]
+                ],
+                [
+                  "{}",
+                  [
+                    ":padding-top",
+                    "32"
+                  ],
+                  [
+                    ":border-left",
+                    [
+                      "str",
+                      "|1px solid ",
+                      [
+                        "hsl",
+                        "0",
+                        "0",
+                        "30"
+                      ]
+                    ]
+                  ],
+                  [
+                    ":padding-left",
+                    "3"
+                  ]
+                ],
+                [
+                  "{}",
+                  [
+                    ":border-left",
+                    [
+                      "str",
+                      "|1px solid ",
+                      [
+                        "hsl",
+                        "0",
+                        "0",
+                        "30"
+                      ]
+                    ]
+                  ],
+                  [
+                    ":padding-left",
+                    "3"
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ],
+        [
+          "->",
+          "expr",
+          [
+            "map-indexed",
+            [
+              "fn",
+              [
+                "idx",
+                "child"
+              ],
+              [
+                "[]",
+                "idx",
+                [
+                  "cond",
+                  [
+                    [
+                      "string?",
+                      "child"
+                    ],
+                    [
+                      "div",
+                      [
+                        "{}"
+                      ],
+                      [
+                        "comp-leaf",
+                        "child"
+                      ]
+                    ]
+                  ],
+                  [
+                    [
+                      "list?",
+                      "child"
+                    ],
+                    [
+                      "if",
+                      [
+                        "empty?",
+                        "child"
+                      ],
+                      [
+                        "comp-empty"
+                      ],
+                      [
+                        "comp-expr-horizontal",
+                        "child"
+                      ]
+                    ]
+                  ],
+                  [
+                    "true",
+                    [
+                      "comp-leaf",
+                      [
+                        "str",
+                        "child"
+                      ]
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.comp.expr/comp-expr-vertical",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'respo.schema/Component"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          [
+            "::",
+            "'List",
+            "'Dynamic"
+          ]
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defcomp",
+      "comp-leaf",
+      [
+        "text"
+      ],
+      [
+        "div",
+        [
+          "{}",
+          [
+            ":style",
+            [
+              "{}",
+              [
+                ":display",
+                ":inline-block"
+              ],
+              [
+                ":padding",
+                "|0 4px"
+              ],
+              [
+                ":background-color",
+                [
+                  "hsl",
+                  "0",
+                  "0",
+                  "20"
+                ]
+              ],
+              [
+                ":border-radius",
+                "|4px"
+              ],
+              [
+                ":font-size",
+                "14"
+              ],
+              [
+                ":line-height",
+                "|24px"
+              ],
+              [
+                ":margin",
+                "|2px"
+              ]
+            ]
+          ]
+        ],
+        [
+          "<>",
+          "text"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.comp.expr/comp-leaf",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'respo.schema/Component"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'String"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "def",
+      "dev?",
+      [
+        "=",
+        "|dev",
+        [
+          [
+            "get-env",
+            "|mode"
+          ],
+          ".unwrap-or",
+          "|release"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.config/dev?",
+    "js_ffi": null,
+    "schema": "'Bool",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "def",
+      "site",
+      [
+        "{}",
+        [
+          ":title",
+          "|Calcit"
+        ],
+        [
+          ":icon",
+          "|http://cdn.tiye.me/logo/mvc-works.png"
+        ],
+        [
+          ":storage-key",
+          "|hv-layout"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.config/site",
+    "js_ffi": null,
+    "schema": [
+      "::",
+      "'Map",
+      "'Tag",
+      "'String"
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defref",
+      "*reel",
+      [
+        "assert-type",
+        [
+          "typed/new-reel",
+          "store"
+        ],
+        [
+          "::",
+          "'reel.typed/State",
+          "'app.schema/Op",
+          "'app.schema/Store"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.main/*reel",
+    "js_ffi": null,
+    "schema": [
+      "::",
+      "'Ref",
+      [
+        "::",
+        "'reel.typed/State",
+        "'app.schema/Op",
+        "'app.schema/Store"
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defref",
+      "*storage-error?",
+      "false"
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.main/*storage-error?",
+    "js_ffi": null,
+    "schema": [
+      "::",
+      "'Ref",
+      "'Bool"
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "dispatch!",
+      [
+        "op"
+      ],
+      [
+        "when",
+        "config/dev?",
+        [
+          "println",
+          "|Dispatch:",
+          "op"
+        ]
+      ],
+      [
+        "let",
+        [
+          [
+            "op-id",
+            [
+              "generate-id!"
+            ]
+          ],
+          [
+            "op-time",
+            [
+              "host/now-ms"
+            ]
+          ]
+        ],
+        [
+          "reset!",
+          "*reel",
+          [
+            "match",
+            [
+              "typed/decode-control",
+              "op"
+            ],
+            [
+              [
+                ":some",
+                "control"
+              ],
+              [
+                "typed/apply-control",
+                "updater",
+                "@*reel",
+                "control"
+              ]
+            ],
+            [
+              [
+                ":none"
+              ],
+              [
+                "typed/record-op",
+                "updater",
+                "@*reel",
+                [
+                  "app.schema/decode-op",
+                  "op"
+                ],
+                "op-id",
+                "op-time"
+              ]
+            ]
+          ]
+        ],
+        "&unit"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.main/dispatch!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Enum"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "main!",
+      [],
+      [
+        "println",
+        "|Running mode:",
+        [
+          "if",
+          "config/dev?",
+          "|dev",
+          "|release"
+        ]
+      ],
+      [
+        "render-app!"
+      ],
+      [
+        "add-watch!",
+        "*reel",
+        ":changes",
+        [
+          "fn",
+          [
+            "_reel",
+            "_previous"
+          ],
+          [
+            "render-app!"
+          ],
+          "&unit"
+        ]
+      ],
+      [
+        "listen-devtools!",
+        "|k",
+        "dispatch!"
+      ],
+      [
+        "browser/add-event-listener!",
+        "|beforeunload",
+        [
+          "fn",
+          [
+            "event"
+          ],
+          [
+            "persist-storage!"
+          ]
+        ]
+      ],
+      [
+        "repeat!",
+        "60",
+        "persist-storage!"
+      ],
+      [
+        "let",
+        [
+          [
+            "raw",
+            [
+              "browser/storage-get",
+              [
+                ".unwrap-or",
+                [
+                  "get",
+                  "config/site",
+                  ":storage-key"
+                ],
+                "|hv-layout"
+              ]
+            ]
+          ]
+        ],
+        [
+          "when",
+          [
+            ".some?",
+            "raw"
+          ],
+          [
+            "restore-storage!",
+            [
+              ".unwrap",
+              "raw"
+            ]
+          ]
+        ]
+      ],
+      [
+        "println",
+        "|App started."
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.main/main!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "def",
+      "mount-target",
+      [
+        ".unwrap",
+        [
+          "respo.ffi.browser/query-selector",
+          "|.app"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.main/mount-target",
+    "js_ffi": null,
+    "schema": "'respo.dom/DomElement",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "persist-storage!",
+      [],
+      [
+        "if",
+        "@*storage-error?",
+        "&unit",
+        [
+          "browser/storage-set!",
+          [
+            ".unwrap-or",
+            [
+              "get",
+              "config/site",
+              ":storage-key"
+            ],
+            "|hv-layout"
+          ],
+          [
+            "format-cirru-edn",
+            [
+              ":store",
+              "@*reel"
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.main/persist-storage!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "reload!",
+      [],
+      [
+        "if",
+        [
+          "nil?",
+          "build-errors"
+        ],
+        [
+          "do",
+          [
+            "remove-watch!",
+            "*reel",
+            ":changes"
+          ],
+          [
+            "clear-cache!"
+          ],
+          [
+            "add-watch!",
+            "*reel",
+            ":changes",
+            [
+              "fn",
+              [
+                "_reel",
+                "_previous"
+              ],
+              [
+                "render-app!"
+              ],
+              "&unit"
+            ]
+          ],
+          [
+            "reset!",
+            "*reel",
+            [
+              "typed/refresh",
+              "updater",
+              "@*reel",
+              "store"
+            ]
+          ],
+          [
+            "hud!",
+            "|ok~",
+            "|Ok"
+          ]
+        ],
+        [
+          "hud!",
+          "|error",
+          "build-errors"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.main/reload!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "render-app!",
+      [],
+      [
+        "render!",
+        "mount-target",
+        [
+          "comp-container",
+          "@*reel"
+        ],
+        "dispatch!"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.main/render-app!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "repeat!",
+      [
+        "duration",
+        "cb"
+      ],
+      [
+        "browser/set-timeout!",
+        [
+          "fn",
+          [],
+          [
+            "cb"
+          ],
+          [
+            "repeat!",
+            "duration",
+            "cb"
+          ]
+        ],
+        [
+          "*",
+          "1000",
+          "duration"
+        ]
+      ],
+      "&unit"
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.main/repeat!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Number",
+          [
+            "::",
+            "'Fn",
+            [
+              "{}",
+              [
+                ":return",
+                "'Unit"
+              ],
+              [
+                ":args",
+                [
+                  "[]"
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "restore-storage!",
+      [
+        "raw"
+      ],
+      [
+        "try",
+        [
+          "do",
+          [
+            "dispatch!",
+            [
+              "app.schema/Op",
+              ":hydrate-storage",
+              [
+                "parse-cirru-edn",
+                "raw"
+              ]
+            ]
+          ],
+          [
+            "reset!",
+            "*storage-error?",
+            "false"
+          ],
+          "&unit"
+        ],
+        [
+          "fn",
+          [
+            "message"
+          ],
+          [
+            "reset!",
+            "*storage-error?",
+            "true"
+          ],
+          [
+            "hud!",
+            "|error",
+            [
+              "str",
+              "|Cannot restore stored layout: ",
+              "message"
+            ]
+          ],
+          "&unit"
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.main/restore-storage!",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'Unit"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'String"
+        ]
+      ],
+      [
+        ":features",
+        [
+          "#{}",
+          ":js-ffi"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defenum",
+      "Op",
+      [
+        ":states",
+        [
+          "::",
+          "'List",
+          "'Dynamic"
+        ],
+        "'Dynamic"
+      ],
+      [
+        ":content",
+        "'String"
+      ],
+      [
+        ":hydrate-storage",
+        "'Dynamic"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.schema/Op",
+    "js_ffi": null,
+    "schema": "'EnumDef",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defstruct",
+      "Store",
+      [
+        ":states",
+        [
+          "::",
+          "'Map",
+          "'Dynamic",
+          "'Dynamic"
+        ]
+      ],
+      [
+        ":content",
+        "'String"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.schema/Store",
+    "js_ffi": null,
+    "schema": "'StructDef",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "decode-op",
+      [
+        "op"
+      ],
+      [
+        "match",
+        "op",
+        [
+          [
+            ":states",
+            "cursor",
+            "data"
+          ],
+          [
+            "Op",
+            ":states",
+            [
+              "decode-map-as",
+              "cursor",
+              [
+                "::",
+                "'List",
+                "'Dynamic"
+              ]
+            ],
+            "data"
+          ]
+        ],
+        [
+          [
+            ":content",
+            "data"
+          ],
+          [
+            "Op",
+            ":content",
+            [
+              "decode-map-as",
+              "data",
+              "'String"
+            ]
+          ]
+        ],
+        [
+          [
+            ":hydrate-storage",
+            "data"
+          ],
+          [
+            "Op",
+            ":hydrate-storage",
+            "data"
+          ]
+        ],
+        [
+          "_",
+          [
+            "raise",
+            [
+              "str",
+              "|Unknown layout operation: ",
+              "op"
+            ]
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.schema/decode-op",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'app.schema/Op"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'Enum"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": [
+      {
+        "code": [
+          "do",
+          [
+            "assert=",
+            [
+              "Op",
+              ":content",
+              "|legacy"
+            ],
+            [
+              "decode-op",
+              [
+                "::",
+                ":content",
+                "|legacy"
+              ]
+            ]
+          ],
+          [
+            "assert=",
+            "true",
+            [
+              "try",
+              [
+                "do",
+                [
+                  "decode-op",
+                  [
+                    "::",
+                    ":content",
+                    "31"
+                  ]
+                ],
+                "false"
+              ],
+              [
+                "fn",
+                [
+                  "_error"
+                ],
+                "true"
+              ]
+            ]
+          ]
+        ],
+        "name": "adapts-legacy-enum-protocol",
+        "tags": [
+          "regression",
+          "unit"
+        ]
+      }
+    ]
+  },
+  {
+    "code": [
+      "def",
+      "store",
+      [
+        "Store",
+        ":states",
+        [
+          "{}"
+        ],
+        ":content",
+        "|"
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.schema/store",
+    "js_ffi": null,
+    "schema": "'app.schema/Store",
+    "tags": [],
+    "tests": []
+  },
+  {
+    "code": [
+      "defn",
+      "updater",
+      [
+        "store",
+        "op",
+        "op-id",
+        "op-time"
+      ],
+      [
+        "match",
+        "op",
+        [
+          [
+            ":states",
+            "cursor",
+            "s"
+          ],
+          [
+            "assoc",
+            "store",
+            ":states",
+            [
+              "decode-map-as",
+              [
+                "respo.cursor/update-state-tree",
+                [
+                  ":states",
+                  "store"
+                ],
+                "cursor",
+                "s"
+              ],
+              [
+                "::",
+                "'Map",
+                "'Dynamic",
+                "'Dynamic"
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            ":content",
+            "data"
+          ],
+          [
+            "assoc",
+            "store",
+            ":content",
+            "data"
+          ]
+        ],
+        [
+          [
+            ":hydrate-storage",
+            "data"
+          ],
+          [
+            "decode-map-as",
+            [
+              "if",
+              [
+                "struct?",
+                "data"
+              ],
+              [
+                "&struct:to-map",
+                "data"
+              ],
+              "data"
+            ],
+            "app.schema/Store"
+          ]
+        ],
+        [
+          "_",
+          [
+            "do",
+            [
+              "println",
+              "|unknown op:",
+              "op"
+            ],
+            "store"
+          ]
+        ]
+      ]
+    ],
+    "doc": "",
+    "examples": [],
+    "ffi": null,
+    "ffi_edn": null,
+    "id": "app.updater/updater",
+    "js_ffi": null,
+    "schema": [
+      "{}",
+      [
+        ":kind",
+        ":fn"
+      ],
+      [
+        ":return",
+        "'app.schema/Store"
+      ],
+      [
+        ":args",
+        [
+          "[]",
+          "'app.schema/Store",
+          "'app.schema/Op",
+          "'String",
+          "'Number"
+        ]
+      ]
+    ],
+    "tags": [],
+    "tests": [
+      {
+        "code": [
+          "is=",
+          [
+            "app.schema/Store",
+            ":states",
+            [
+              "{}"
+            ],
+            ":content",
+            "|restored"
+          ],
+          [
+            "updater",
+            [
+              "app.schema/Store",
+              ":states",
+              [
+                "{}"
+              ],
+              ":content",
+              "|old"
+            ],
+            [
+              "app.schema/Op",
+              ":hydrate-storage",
+              [
+                "parse-cirru-edn",
+                [
+                  "format-cirru-edn",
+                  [
+                    "app.schema/Store",
+                    ":states",
+                    [
+                      "{}"
+                    ],
+                    ":content",
+                    "|restored"
+                  ]
+                ]
+              ]
+            ],
+            "|test",
+            "0"
+          ]
+        ],
+        "name": "hydrates-stored-content",
+        "tags": [
+          "storage",
+          "unit"
+        ]
+      },
+      {
+        "code": [
+          "let",
+          [
+            [
+              "original",
+              [
+                "app.schema/Store",
+                ":states",
+                [
+                  "{}",
+                  [
+                    "|legacy",
+                    "31"
+                  ]
+                ],
+                ":content",
+                "|keep"
+              ]
+            ],
+            [
+              "nested",
+              [
+                "updater",
+                "original",
+                [
+                  "app.schema/Op",
+                  ":states",
+                  [
+                    "[]",
+                    ":viewer",
+                    "|mixed",
+                    "7"
+                  ],
+                  "false"
+                ],
+                "|nested",
+                "1"
+              ]
+            ],
+            [
+              "root",
+              [
+                "updater",
+                "nested",
+                [
+                  "app.schema/Op",
+                  ":states",
+                  [
+                    "[]"
+                  ],
+                  "|root"
+                ],
+                "|root",
+                "2"
+              ]
+            ]
+          ],
+          [
+            "assert=",
+            "false",
+            [
+              "option:unwrap",
+              [
+                "get-in",
+                [
+                  ":states",
+                  "nested"
+                ],
+                [
+                  "[]",
+                  ":viewer",
+                  "|mixed",
+                  "7",
+                  ":data"
+                ]
+              ]
+            ]
+          ],
+          [
+            "assert=",
+            "31",
+            [
+              "option:unwrap",
+              [
+                "get",
+                [
+                  ":states",
+                  "root"
+                ],
+                "|legacy"
+              ]
+            ]
+          ],
+          [
+            "assert=",
+            "false",
+            [
+              "contains?",
+              [
+                ":states",
+                "root"
+              ],
+              ":states"
+            ]
+          ],
+          [
+            "assert=",
+            "|root",
+            [
+              "option:unwrap",
+              [
+                "get",
+                [
+                  ":states",
+                  "root"
+                ],
+                ":data"
+              ]
+            ]
+          ],
+          [
+            "assert=",
+            "|keep",
+            [
+              ":content",
+              "root"
+            ]
+          ]
+        ],
+        "name": "updates-state-subtree-without-nesting-store",
+        "tags": [
+          "regression",
+          "unit"
+        ]
+      }
+    ]
+  }
+]

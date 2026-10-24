@@ -1,0 +1,33 @@
+import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+import {mkdirSync,readFileSync,writeFileSync} from 'node:fs';
+const run=(...a)=>execFileSync(process.env.HV_QUERY_CLI||'calcit',a,{encoding:'utf8',maxBuffer:10*1024*1024,stdio:['ignore','pipe','pipe']});
+const q=(...a)=>JSON.parse(run('query',...a,'--format','json')).data;
+mkdirSync('acceptance',{recursive:true});
+function inventory(){
+  const defs=[];
+  for(const ns of q('ns').namespaces){
+    const names=run('query','defs',ns).split('\n').filter(x=>/^  \S/.test(x)).map(x=>x.trim().split(' ')[0]);
+    assert.equal(names.length,q('ns',ns).definition_count);
+    for(const n of names)defs.push(q('def',ns+'/'+n));
+  }
+  assert.equal(defs.length,25);assert.equal(defs.reduce((n,d)=>n+d.tests.length,0),3);return defs;
+}
+if(process.argv[2]==='inventory'){
+  writeFileSync('acceptance/reviewed.json',JSON.stringify(inventory(),null,2));process.exit(0);
+}
+assert.equal(run('-v').trim(),'0.30.1');run('docs','agents','--contract');
+const before=inventory(),config=q('config');assert.deepEqual(before,JSON.parse(readFileSync('acceptance/reviewed.json','utf8')));
+const expected=structuredClone(before),ops=[];
+for(const [id,path] of [['app.comp.container/comp-container','@3.2.1.1.1.0'],['app.comp.expr/comp-expr-horizontal','@3.1.1.1.0'],['app.comp.expr/comp-expr-vertical','@3.1.1.1.0']]){
+  const shown=JSON.parse(run('tree','show',id,'--path',path,'--format','json'));assert.equal(shown.tree,'merge');
+  const def=expected.find(d=>d.id===id),indices=path.slice(1).split('.').map(Number);let node=def.code;
+  for(const i of indices.slice(0,-1))node=node[i];assert.equal(node[indices.at(-1)],'merge');node[indices.at(-1)]='.merge';
+  ops.push(['tree','replace',id,'--path',path,'--input-format','cirru','--code','quote .merge','--expect','quote merge']);
+}
+writeFileSync('acceptance/before.json',JSON.stringify(before,null,2));writeFileSync('acceptance/operations.json',JSON.stringify(ops,null,2));
+const args=['edit','transaction','--file','acceptance/operations.json','--format','json'];const preview=JSON.parse(run(...args,'--dry-run'));assert.ok(preview.scoped_revision);
+writeFileSync('acceptance/preview.json',JSON.stringify(preview,null,2));writeFileSync('acceptance/applied.json',run(...args,'--expect-revision',preview.scoped_revision));
+assert.deepEqual(inventory(),expected);assert.deepEqual(q('config'),config);
+writeFileSync('acceptance/after.json',JSON.stringify(expected,null,2));writeFileSync('acceptance/snapshot-blob.txt',execFileSync('git',['hash-object','calcit.cirru'],{encoding:'utf8'}));
+console.log('25 full views guarded: only 3 Map merge heads changed; 3 attached tests, schema, HUD, FFI and config preserved');

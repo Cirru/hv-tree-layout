@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - prepare/hv-tree-source031
   pull_request: {}
 
 permissions:
@@ -43,9 +44,11 @@ jobs:
         caps verify --toolchain
         test ! -e compact.cirru
         test ! -e package.cirru
+        node prepare-source.mjs
         calcit edit format
-        git diff --exit-code -- calcit.cirru
+        test "$(git hash-object calcit.cirru)" = "$(cat acceptance/snapshot-blob.txt)"
         calcit calcit.cirru --check-only --all-defs
+        calcit fix --workflow strict --verify --format json | jq -e '.data.workflow.status? == "passed" and .diagnostics? == []'
         calcit calcit.cirru analyze quality --baseline config/calcit-quality.cirru
         calcit calcit.cirru --check-only --ns app.main --ns app.comp.container --ns app.comp.expr --ns app.updater --ns app.config --ns app.schema --summary-only
         calcit calcit.cirru test --require-match
@@ -75,7 +78,18 @@ jobs:
         if-no-files-found: error
         retention-days: 90
 
+    - name: Preserve official source preparation evidence
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: hv-tree-source-prepared
+        path: |
+          calcit.cirru
+          acceptance
+          dist
+        retention-days: 3
+
   upload:
+    if: github.ref != 'refs/heads/prepare/hv-tree-source031'
     needs: test
     runs-on: ubuntu-latest
     concurrency:
