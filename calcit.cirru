@@ -16,7 +16,7 @@
                 store $ :store reel
                 states $ :states store
               div
-                {} $ :style $ merge ui/global
+                {} $ :style $ .merge ui/global
                   {}
                     :color $ hsl 0 0 100
                     :padding 16
@@ -63,7 +63,7 @@
         'comp-expr-horizontal $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-expr-horizontal (expr)
             list->
-              {} $ :style $ merge ui/row
+              {} $ :style $ .merge ui/row
                 if
                   list? $
                     first expr
@@ -87,7 +87,7 @@
         'comp-expr-vertical $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-expr-vertical (expr)
             list->
-              {} $ :style $ merge ui/column
+              {} $ :style $ .merge ui/column
                 if
                   list? $
                     first expr
@@ -149,7 +149,7 @@
       :defs $ {}
         '*reel $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defref *reel
-            assert-type (typed/new-reel store) (:: 'reel.typed/State 'app.schema/Op 'app.schema/Store)
+            typed/State :base store :store store :records ([]) :pointer (Option :none) :stopped? false :display? false :merged? false
           :examples $ []
           :schema $ :: 'Ref $ :: 'reel.typed/State 'app.schema/Op 'app.schema/Store
         '*storage-error? $ %{} 'CodeEntry (:doc |)
@@ -210,13 +210,19 @@
                 reset! *reel $ typed/refresh updater @*reel store
                 hud! |ok~ |Ok
               hud! |error build-errors
+            , &unit
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ []
             :features $ #{} :js-ffi
         'render-app! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-app! ()
-            render! mount-target (comp-container @*reel) dispatch!
+            render! mount-target (comp-container @*reel)
+              fn (op)
+                hint-fn $ {}
+                  :args $ [] 'Dynamic
+                  :return 'Unit
+                if (enum? op) (dispatch! op) (raise "|Expected a layout operation enum")
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'Unit)
             :args $ []
@@ -346,10 +352,10 @@
                   root $ updater nested
                     app.schema/Op :states ([]) |root
                     , |root 2
-                assert= false $ option:unwrap $ get-in (:states nested) ([] :viewer |mixed 7 :data)
-                assert= 31 $ option:unwrap $ get (:states root) |legacy
+                assert= false $ .unwrap $ get-in (:states nested) ([] :viewer |mixed 7 :data)
+                assert= 31 $ .unwrap $ get (:states root) |legacy
                 assert= false $ contains? (:states root) :states
-                assert= |root $ option:unwrap $ get (:states root) :data
+                assert= |root $ .unwrap $ get (:states root) :data
                 assert= |keep $ :content root
               :tags $ #{} :regression :unit
       :ns $ %{} 'NsEntry (:doc |)

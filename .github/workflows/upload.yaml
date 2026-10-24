@@ -44,8 +44,16 @@ jobs:
         test ! -e compact.cirru
         test ! -e package.cirru
         calcit edit format
-        git diff --exit-code -- calcit.cirru
+        if ! git diff --quiet --exit-code -- calcit.cirru; then
+          echo '::error::calcit.cirru is not canonical; run the pinned Calcit edit format and commit its reviewed result.'
+          exit 1
+        fi
         calcit calcit.cirru --check-only --all-defs
+        strict_exit=0
+        strict_report="$(calcit fix --workflow strict --verify --format json)" || strict_exit=$?
+        printf '%s\n' "$strict_report"
+        test "$strict_exit" -eq 0
+        jq -e '.data.workflow.status? == "passed" and .diagnostics? == []' <<< "$strict_report"
         calcit calcit.cirru analyze quality --baseline config/calcit-quality.cirru
         calcit calcit.cirru --check-only --ns app.main --ns app.comp.container --ns app.comp.expr --ns app.updater --ns app.config --ns app.schema --summary-only
         calcit calcit.cirru test --require-match

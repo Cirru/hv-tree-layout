@@ -7,13 +7,14 @@
 
 ### 本地验证
 
-使用者影响：需要精确配套正式 Calcit / `@calcit/procs` **0.30.1**、Caps 0.1.1、Node.js 24 和 Yarn 4.18.0。四个直接模块均使用正式 tag：Respo 0.16.124、Reel 0.6.41、Respo UI 0.8.0、js-ffi 0.2.5，传递 Router 0.8.37。升级后完整刷新；UI 0.8 可能改变 Demo 基础控件外观，三组布局样例、历史回放、原存档 key/格式与错误暂停保存行为不变。安装依赖后运行：
+使用者影响：需要精确配套正式 Calcit / `@calcit/procs` **0.30.1**、Caps 0.1.1、Node.js 24 和 Yarn 4.18.0。四个直接模块均使用正式 tag：Respo 0.16.126、Reel 0.6.42、Respo UI 0.8.1、js-ffi 0.2.6，传递 Router 0.8.38。升级后完整刷新；UI 0.8 可能改变 Demo 基础控件外观，三组布局样例、历史回放、原存档 key/格式与错误暂停保存行为不变。安装依赖后运行：
 
 ```bash
 caps --strict --ci
 yarn install --immutable
 caps verify --toolchain
 calcit calcit.cirru --check-only --all-defs
+calcit fix --workflow strict --verify
 calcit calcit.cirru --check-only --ns app.main --ns app.comp.container --ns app.comp.expr --ns app.updater --ns app.config --ns app.schema --summary-only
 calcit calcit.cirru test --require-match
 calcit calcit.cirru analyze quality --baseline config/calcit-quality.cirru
@@ -25,9 +26,17 @@ yarn vite build
 
 默认构建使用相对路径；`VITE_BASE_URL` 可以指定前端 CDN 路径。CI 的主分支资源位于 `https://cos-sh.tiye.me/Cirru/hv-tree-layout/`，PR 使用独立的 `pr/<number>/<run>/<attempt>/` 子目录，构建、上传和公开访问校验共用同一个前缀。配置 `COS_BUCKET`、`COS_SECRET_ID`、`COS_SECRET_KEY` 后，由正式 cos-upload-action 1.2.0 的内置能力检查 HTML 同域脚本/样式引用与上传内容，不再增加项目校验脚本；Action 使用该发布版本的不可变提交。
 
-保留已测试 artifact 的传递、上传队列、过期 HEAD 检查和原 main push 服务器部署；COS 只处理前端 `dist`，原 `dist/*` 和目标目录不变。CI 不要求固定迁移期 `fix strict` workflow，保留严格依赖/工具链、canonical、全定义与公开定义检查、质量预算、附属测试和 JS 构建。废弃调用由已有质量预算的零上限拦截，不另加重复检查脚本。
+保留已测试 artifact 的传递、上传队列、过期 HEAD 检查和原 main push 服务器部署；COS 只处理前端 `dist`，原 `dist/*` 和目标目录不变。CI 保留严格依赖/工具链、canonical、全定义与公开定义检查、质量预算、附属测试和 JS 构建，并要求完整 `fix --workflow strict --verify` 通过且 diagnostics 为空。废弃调用由已有质量预算的零上限拦截，不另加重复检查脚本。
 
 ### 迁移影响与边界
+
+本轮将三处布局样式 Map 合并改为 `.merge`，保持右侧覆盖顺序；原状态回归中的三处
+Option 解包改为 `.unwrap`，测试名称、标签和全部断言不变。空 Reel 直接用公开
+`typed/State` 构造器及已有 `Ref<State<Op,Store>>` 上下文初始化，七个字段与原
+`new-reel` 完全相同，移除无法证明 Op 来源的强断言，不将已有开放记录强转为业务 Op。
+保留 `hud!`、全部三组历史展示文本、存档行为和原质量预算，不创建新脚本或迁移框架。
+Respo 的开放回调先检查 Enum，再转交原业务 dispatch；非 Enum 会明确报错。
+`reload!` 仍执行原 HUD 提示，然后显式返回 Unit，不把宿主提示函数的未知返回值当作 Unit 证明。
 
 存储 key 仍为 `hv-layout`，保存时机仍为 beforeunload 与每 60 秒；旧 Map 和已序列化 Store 均恢复为实际检查后的 Store。恢复失败会显示错误并暂停自动保存，不删除或覆盖原缓存；成功恢复后才解除暂停。存档字段和三组布局样例不变。
 
