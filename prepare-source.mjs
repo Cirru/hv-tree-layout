@@ -35,9 +35,17 @@ function migrateTest(node){
 }
 migrateTest(test.code);assert.equal(testChanges,3);
 ops.push(['edit','add-test',tested.id,test.name,'--tags',test.tags.join(','),'--overwrite','--input-format','json-ast','--code',JSON.stringify(test.code)]);
+const reel=expected.find(d=>d.id==='app.main/*reel');
+const oldInitializer=['assert-type',['typed/new-reel','store'],['::',"'reel.typed/State","'app.schema/Op","'app.schema/Store"]];
+assert.deepEqual(reel.code,['defref','*reel',oldInitializer]);
+assert.deepEqual(q('def','reel.typed/new-reel').code,['defn','new-reel',['base'],['State',':base','base',':store','base',':records',['[]'],':pointer',['Option',':none'],':stopped?','false',':display?','false',':merged?','false']]);
+const initializer=['typed/State',':base','store',':store','store',':records',['[]'],':pointer',['Option',':none'],':stopped?','false',':display?','false',':merged?','false'];
+const reelShown=JSON.parse(run('tree','show',reel.id,'--path','@2','--format','json'));assert.deepEqual(reelShown.tree,oldInitializer);
+reel.code[2]=initializer;
+ops.push(['tree','replace',reel.id,'--path','@2','--input-format','json-ast','--code',JSON.stringify(initializer),'--expect',"quote (assert-type (typed/new-reel store) (:: 'reel.typed/State 'app.schema/Op 'app.schema/Store))"]);
 writeFileSync('acceptance/before.json',JSON.stringify(before,null,2));writeFileSync('acceptance/operations.json',JSON.stringify(ops,null,2));
 const args=['edit','transaction','--file','acceptance/operations.json','--format','json'];const preview=JSON.parse(run(...args,'--dry-run'));assert.ok(preview.scoped_revision);
 writeFileSync('acceptance/preview.json',JSON.stringify(preview,null,2));writeFileSync('acceptance/applied.json',run(...args,'--expect-revision',preview.scoped_revision));
 assert.deepEqual(inventory(),expected);assert.deepEqual(q('config'),config);
 writeFileSync('acceptance/after.json',JSON.stringify(expected,null,2));writeFileSync('acceptance/snapshot-blob.txt',execFileSync('git',['hash-object','calcit.cirru'],{encoding:'utf8'}));
-console.log('25 full views guarded: 3 Map merge and 3 attached Option unwrap heads changed; original 3 test names/tags/assertions, schema, HUD, FFI and config preserved');
+console.log('25 full views guarded: 3 Map merge, 3 attached Option unwrap, and one empty typed State initializer; original 3 test names/tags/assertions, schema, HUD, FFI and config preserved');
