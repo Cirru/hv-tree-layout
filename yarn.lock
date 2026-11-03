@@ -12,15 +12,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@calcit/procs@npm:0.32.1":
-  version: 0.32.1
-  resolution: "@calcit/procs@npm:0.32.1"
+"@calcit/procs@npm:0.34.2":
+  version: 0.34.2
+  resolution: "@calcit/procs@npm:0.34.2"
   dependencies:
     "@calcit/finger-vec": "npm:0.1.1"
     "@calcit/ternary-tree": "npm:0.0.26"
     "@cirru/parser.ts": "npm:0.0.10"
     "@cirru/writer.ts": "npm:^0.1.9"
-  checksum: 10c0/54c505396a4653e643d24eaa71bf9a029b48034cabcd68ce47b2b40b565cf04a4693ac47c7feb34b8e84936621a397802743bffd3134ddeb37b08d23ef113923
+  checksum: 10c0/d59000d82051a28f7929671f76c49959fd63d377e2002cf11ae59a73070d6f8f436190007033015cbf6c41245ee7aecc0289d6c081463720c93df604d9bf2d0b
   languageName: node
   linkType: hard
 
@@ -630,7 +630,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "root-workspace-0b6124@workspace:."
   dependencies:
-    "@calcit/procs": "npm:0.32.1"
+    "@calcit/procs": "npm:0.34.2"
     bottom-tip: "npm:^0.1.5"
     vite: "npm:^8.2.4"
   languageName: unknown
@@ -683,9 +683,9 @@ __metadata:
   linkType: hard
 
 "undici@npm:^8.4.1":
-  version: 8.10.2
-  resolution: "undici@npm:8.10.2"
-  checksum: 10c0/66d7fc69149207cab570d6abbc9e965b6afe1ae889a7d46945b431165c973d6a56f3dd8b70a856e7ae1e550b6366a1cde6f06e68640587f0dadca38de72995ee
+  version: 8.12.3
+  resolution: "undici@npm:8.12.3"
+  checksum: 10c0/714919e62b4160eea195fb35c7f5c4907235741e47bfde8a014ac58f6d24df13434e23400d7f48e2c455fd2b259d27f07fce514f04a5b4e99936ba62cbc4bb71
   languageName: node
   linkType: hard
 
