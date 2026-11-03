@@ -7,7 +7,7 @@
 
 ### 本地验证
 
-使用者影响：本轮配套正式 Calcit / `@calcit/procs` **0.32.1**、Caps 0.1.1、Node.js 24 和 Yarn 4.18.0。通过实际严格安装的已发布依赖图为 Respo 0.17.1、Reel 0.7.0、Respo UI 0.9.0、js-ffi 0.2.9；UI 的传递 Router 版本保持 0.9.0-alpha.4。新 npm 解析至少等待一小时，不设置例外。升级后完整刷新；三组布局样例、存档 key/格式、错误暂停保存行为和 HUD 不变。安装依赖后运行：
+使用者影响：本轮配套正式 Calcit / `@calcit/procs` **0.34.2**、Caps 0.1.1、Node.js 24 和 Yarn 4.18.0。通过实际严格安装的已发布依赖图为 Respo 0.18.1、Reel 0.8.1、Respo UI 0.12.1、js-ffi 0.2.9，传递 Router 0.10.1。保留 Map 事件和 Router struct 兼容图，不能与 Respo 0.19 新事件图混装。新 npm 解析至少等待一小时，不设置例外。升级后完整刷新；三组布局样例、存档 key/格式、错误暂停保存行为和 HUD 不变。安装依赖后运行：
 
 ```bash
 caps --strict --ci
@@ -28,7 +28,20 @@ yarn vite build
 
 保留已测试 artifact 的传递、上传队列、过期 HEAD 检查和原 main push 服务器部署；COS 只处理前端 `dist`，原 `dist/*` 和目标目录不变。CI 保留严格依赖/工具链、canonical、全定义与公开定义检查、质量预算、附属测试和 JS 构建，并要求完整 `fix --workflow strict --verify` 通过且 diagnostics 为空。废弃调用由已有质量预算的零上限拦截，不另加重复检查脚本。
 
-### 本轮 0.32.1 验收
+### 0.34.2 变更与验收
+
+开发模式的可选 Reel 面板改为显式 Option :some / :none，满足新工具链对缺席子节点的要求。
+官方 CLI 归一化逐定义审计只有 comp-container 的 code 发生语义变化；原 schema、三项附带测试、
+两种布局算法、任意叶值转文本的展示合同和全部 data 文本保持。原质量基线逐字节不变，unsafe 仍为 0。
+已通过正式 Caps strict / toolchain、immutable、197 个全定义、24 个公开定义、完整 strict、
+原三项附带测试、原质量预算及 Vite 构建；没有新增验证脚本或编译器规则。
+
+两处 List Dynamic 是实际开放的展示入口：String、递归 List 和其他任意值均可显示，后者会转为文本。
+本轮不为减少计数把该合同替换为只接受 String/List 的 union。三组示例的源解析结构有更窄形状，
+但它不能代表展示 API 的全部输入。现有 Dependabot #26 的 Undici 8.12.3 锁文件修复已纳入，
+避免并行改写同一旧锁文件；该 PR 的其余分支/协作状态保持。
+
+### 历史 0.32.1 验收
 
 复用已审阅的 3 处类型表述迁移，0.32.1 官方 format 再次确认无需改写；原 23 个定义的 schema 不变；新增一个 Enum 类型的 DispatchOp 声明，绑定 Respo 的 dispatch-op slot，保留已有开放协议与业务解码检查。
 原状态子树测试的三处旧 `.unwrap` 改为直接比较 `Result :ok` / `Option :some`，成功分支和值同时受断言约束；测试名称、标签和其余断言不变。

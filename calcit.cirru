@@ -27,7 +27,9 @@
                 =< nil 200
                 comp-expr-horizontal $ parse-cirru-list $ inline |bookmark-demo.cirru
                 =< nil 200
-                when dev? $ comp-typed-reel (>> states :reel) reel $ {}
+                if dev?
+                  Option :some $ comp-typed-reel (>> states :reel) reel $ {}
+                  Option :none
           :examples $ []
           :schema $ quote $ Fn (reel.typed/State app.schema/Op app.schema/Store) (-> respo.schema/Component)
         'inline $ %{} 'CodeEntry (:doc |)
@@ -256,15 +258,15 @@
           :code $ quote $ defenum Op
             :states
               quote $ List Dynamic
-              , 'Dynamic
-            :content 'String
-            :hydrate-storage 'Dynamic
+              , Dynamic
+            :content String
+            :hydrate-storage Dynamic
           :examples $ []
           :schema $ quote EnumDef
         'Store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct Store
             :states $ quote $ Map Dynamic Dynamic
-            :content 'String
+            :content String
           :examples $ []
           :schema $ quote StructDef
         'decode-op $ %{} 'CodeEntry (:doc |)
@@ -272,7 +274,7 @@
             match op
               (:states cursor data)
                 Op :states
-                  decode-map-as cursor $ :: 'List 'Dynamic
+                  decode-map-as cursor $ quote $ List Dynamic
                   , data
               (:content data)
                 Op :content $ decode-map-as data 'String
@@ -305,7 +307,7 @@
               (:states cursor s)
                 assoc store :states $ decode-map-as
                   respo.cursor/update-state-tree (:states store) cursor s
-                  :: 'Map 'Dynamic 'Dynamic
+                  quote $ Map Dynamic Dynamic
               (:content data) (assoc store :content data)
               (:hydrate-storage data)
                 decode-map-as
