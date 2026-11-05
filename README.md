@@ -7,7 +7,7 @@
 
 ### 本地验证
 
-使用者影响：本轮配套正式 Calcit / `@calcit/procs` **0.34.2**、Caps 0.1.1、Node.js 24 和 Yarn 4.18.0。通过实际严格安装的已发布依赖图为 Respo 0.18.1、Reel 0.8.1、Respo UI 0.12.1、js-ffi 0.2.9，传递 Router 0.10.1。保留 Map 事件和 Router struct 兼容图，不能与 Respo 0.19 新事件图混装。新 npm 解析至少等待一小时，不设置例外。升级后完整刷新；三组布局样例、存档 key/格式、错误暂停保存行为和 HUD 不变。安装依赖后运行：
+使用者影响：配套正式 Calcit / `@calcit/procs` **0.35.1**、Caps 0.1.1、Node.js 24 和 Yarn 4.18.0。依赖为 Respo 0.19.4、Reel 0.9.2、Respo UI 0.15.1、JS-FFI 0.2.13 与传递 Router 0.12.1。三组布局样例的横纵交替、空分支与原存档格式保持。编辑树输入使用内置递归 `CirruNode`，与 Cirru 解析器的返回类型一致。安装依赖后运行：
 
 ```bash
 caps --strict --ci
