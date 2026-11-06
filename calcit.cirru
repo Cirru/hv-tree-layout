@@ -22,11 +22,11 @@
                     :padding 16
                 div ({})
                   comp-expr-horizontal $ parse-cirru-list $ inline |page-demo.cirru
-                =< nil 200
+                respo.comp.space/space-y 200
                 comp-expr-horizontal $ parse-cirru-list $ inline |updater-demo.cirru
-                =< nil 200
+                respo.comp.space/space-y 200
                 comp-expr-horizontal $ parse-cirru-list $ inline |bookmark-demo.cirru
-                =< nil 200
+                respo.comp.space/space-y 200
                 if dev?
                   Option :some $ comp-typed-reel (>> states :reel) reel $ {}
                   Option :none
@@ -61,50 +61,52 @@
           :schema $ quote $ Fn (-> respo.schema/Component)
         'comp-expr-horizontal $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-expr-horizontal (expr)
-            list->
-              {} $ :style $ .merge ui/row
-                if
-                  list? $
-                    first expr
-                    , .unwrap-or |
-                  {} (:font-family ui/font-code) (:padding-left 32)
-                    :border-top $ str "|1px solid " $ hsl 0 0 20
-                    :padding-top 4
-                  {} (:font-family ui/font-code)
-                    :border-top $ str "|1px solid " $ hsl 0 0 20
-                    :padding-top 4
-              -> expr $ map-indexed $ fn (idx child)
-                [] idx $ cond
-                    string? child
-                    div ({}) (comp-leaf child)
-                  (list? child)
-                    if (empty? child) (comp-empty) (comp-expr-vertical child)
-                  true $ comp-leaf $ str child
+            let
+                nested-head? $ match (first expr)
+                  (:some head)
+                    match head
+                      (String _token) false
+                      (List _children) true
+                  (:none) false
+                style $ {} (:font-family ui/font-code)
+                  :border-top $ str "|1px solid " $ hsl 0 0 20
+                  :padding-top 4
+              respo.core/keyed->
+                {} $ :style $ .merge ui/row
+                  if nested-head? (assoc style :padding-left 32) style
+                map-indexed expr $ fn (idx child)
+                  hint-fn $ Fn Number calcit.core/CirruNode $ -> respo.schema/ChildPair
+                  respo.util.detect/make-child-pair idx $ match child
+                    (String token)
+                      div ({}) (comp-leaf token)
+                    (List branch)
+                      if (empty? branch) (comp-empty) (comp-expr-vertical branch)
           :examples $ []
-          :schema $ quote $ Fn (List Dynamic) (-> respo.schema/Component)
+          :schema $ quote $ Fn (List calcit.core/CirruNode) (-> respo.schema/Component)
         'comp-expr-vertical $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-expr-vertical (expr)
-            list->
-              {} $ :style $ .merge ui/column
-                if
-                  list? $
-                    first expr
-                    , .unwrap-or |
-                  {} (:padding-top 32)
-                    :border-left $ str "|1px solid " $ hsl 0 0 30
-                    :padding-left 3
-                  {}
-                    :border-left $ str "|1px solid " $ hsl 0 0 30
-                    :padding-left 3
-              -> expr $ map-indexed $ fn (idx child)
-                [] idx $ cond
-                    string? child
-                    div ({}) (comp-leaf child)
-                  (list? child)
-                    if (empty? child) (comp-empty) (comp-expr-horizontal child)
-                  true $ comp-leaf $ str child
+            let
+                nested-head? $ match (first expr)
+                  (:some head)
+                    match head
+                      (String _token) false
+                      (List _children) true
+                  (:none) false
+                style $ {}
+                  :border-left $ str "|1px solid " $ hsl 0 0 30
+                  :padding-left 3
+              respo.core/keyed->
+                {} $ :style $ .merge ui/column
+                  if nested-head? (assoc style :padding-top 32) style
+                map-indexed expr $ fn (idx child)
+                  hint-fn $ Fn Number calcit.core/CirruNode $ -> respo.schema/ChildPair
+                  respo.util.detect/make-child-pair idx $ match child
+                    (String token)
+                      div ({}) (comp-leaf token)
+                    (List branch)
+                      if (empty? branch) (comp-empty) (comp-expr-horizontal branch)
           :examples $ []
-          :schema $ quote $ Fn (List Dynamic) (-> respo.schema/Component)
+          :schema $ quote $ Fn (List calcit.core/CirruNode) (-> respo.schema/Component)
         'comp-leaf $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-leaf (text)
             div
@@ -256,16 +258,14 @@
           :schema $ quote Enum
         'Op $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defenum Op
-            :states
-              quote $ List Dynamic
-              , Dynamic
+            :states (List Dynamic) Dynamic
             :content String
             :hydrate-storage Dynamic
           :examples $ []
           :schema $ quote EnumDef
         'Store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct Store
-            :states $ quote $ Map Dynamic Dynamic
+            :states $ Map Dynamic Dynamic
             :content String
           :examples $ []
           :schema $ quote StructDef
@@ -274,7 +274,7 @@
             match op
               (:states cursor data)
                 Op :states
-                  decode-map-as cursor $ quote $ List Dynamic
+                  decode-map-as cursor $ List Dynamic
                   , data
               (:content data)
                 Op :content $ decode-map-as data 'String
@@ -307,7 +307,7 @@
               (:states cursor s)
                 assoc store :states $ decode-map-as
                   respo.cursor/update-state-tree (:states store) cursor s
-                  quote $ Map Dynamic Dynamic
+                  Map Dynamic Dynamic
               (:content data) (assoc store :content data)
               (:hydrate-storage data)
                 decode-map-as
