@@ -233,7 +233,7 @@
           :code $ quote $ defn restore-storage! (raw)
             try
               do
-                dispatch! $ app.schema/Op :hydrate-storage $ parse-cirru-edn raw
+                dispatch! $ :: :hydrate-storage $ parse-cirru-edn raw
                 reset! *storage-error? false
                 , &unit
               fn (message) (reset! *storage-error? true)
@@ -265,7 +265,7 @@
           :code $ quote $ defenum Op
             :states (List respo.schema/CoordKey) Dynamic
             :content String
-            :hydrate-storage Dynamic
+            :hydrate-storage app.schema/Store
           :examples $ []
           :schema $ quote EnumDef
         'ResolvedOp $ %{} 'CodeEntry (:doc |)
@@ -287,7 +287,10 @@
                   , data
               (:content data)
                 Op :content $ decode-map-as data 'String
-              (:hydrate-storage data) (Op :hydrate-storage data)
+              (:hydrate-storage data)
+                Op :hydrate-storage $ decode-map-as
+                  if (struct? data) (&struct:to-map data) data
+                  , app.schema/Store
               _ $ raise $ str "|Unknown layout operation: " op
           :examples $ []
           :schema $ quote $ Fn AnyEnum (-> app.schema/Op)
@@ -318,10 +321,7 @@
                   respo.cursor/update-state-tree (:states store) cursor s
                   Map Dynamic Dynamic
               (:content data) (assoc store :content data)
-              (:hydrate-storage data)
-                decode-map-as
-                  if (struct? data) (&struct:to-map data) data
-                  , app.schema/Store
+              (:hydrate-storage data) data
               _ $ do (println "|unknown op:" op) store
           :examples $ []
           :schema $ quote $ Fn app.schema/Store app.schema/Op String Number (-> app.schema/Store)
@@ -331,8 +331,8 @@
                 app.schema/Store :states ({}) :content |restored
                 updater
                   app.schema/Store :states ({}) :content |old
-                  app.schema/Op :hydrate-storage $ parse-cirru-edn $ format-cirru-edn
-                    app.schema/Store :states ({}) :content |restored
+                  app.schema/decode-op $ :: :hydrate-storage $ parse-cirru-edn
+                    format-cirru-edn $ app.schema/Store :states ({}) :content |restored
                   , |test 0
               :tags $ #{} :storage :unit
             %{} 'TestEntry (:name |updates-state-subtree-without-nesting-store)
