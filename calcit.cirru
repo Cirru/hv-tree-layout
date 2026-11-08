@@ -6,7 +6,7 @@
     {} (:description |) (:init-fn 'app.main/main!) (:mode :js) (:reload-fn 'app.main/reload!) (:target :browser)
       :feature-policy $ {}
       :modules $ [] |respo.calcit/ |respo-ui.calcit/ |reel.calcit/ |js-ffi/
-      :type-slots $ {} $ :dispatch-op |app.schema/DispatchOp
+      :type-slots $ {} $ :dispatch-op 'app.schema/DispatchOp
   :files $ {}
     'app.comp.container $ %{} 'FileEntry
       :defs $ {}
@@ -157,16 +157,21 @@
         'dispatch! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch! (op)
             when config/dev? $ println |Dispatch: op
-            let
-                op-id $ generate-id!
-                op-time $ host/now-ms
-              reset! *reel $ match (typed/decode-control op)
-                (:some control) (typed/apply-control updater @*reel control)
-                (:none)
-                  typed/record-op updater @*reel (app.schema/decode-op op) op-id op-time
-              , &unit
+            match (typed/decode-control op)
+              (:some control) (dispatch-resolved! control)
+              (:none)
+                dispatch-resolved! $ app.schema/decode-op op
           :examples $ []
-          :schema $ quote $ Fn Enum (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn AnyEnum (-> Unit) (:features :js-ffi)
+        'dispatch-resolved! $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn dispatch-resolved! (op)
+            hint-fn $ Fn app.schema/ResolvedOp (-> Unit) (:features :js-ffi)
+            reset! *reel $ match op
+              (reel.typed/Control control) (typed/apply-control updater @*reel control)
+              (app.schema/Op action)
+                typed/record-op updater @*reel action (generate-id!) (host/now-ms)
+            , &unit
+          :examples $ []
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! ()
             println "|Running mode:" $ if config/dev? |dev |release
@@ -209,7 +214,7 @@
           :code $ quote $ defn render-app! ()
             render! mount-target (comp-container @*reel)
               fn (op)
-                hint-fn $ Fn Dynamic $ -> Unit
+                hint-fn $ Fn AnyEnum $ -> Unit
                 if (enum? op) (dispatch! op) (raise "|Expected a layout operation enum")
           :examples $ []
           :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
@@ -255,14 +260,18 @@
         'DispatchOp $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def DispatchOp (:: :content |)
           :examples $ []
-          :schema $ quote Enum
+          :schema $ quote AnyEnum
         'Op $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defenum Op
-            :states (List Dynamic) Dynamic
+            :states (List respo.schema/CoordKey) Dynamic
             :content String
             :hydrate-storage Dynamic
           :examples $ []
           :schema $ quote EnumDef
+        'ResolvedOp $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defunion ResolvedOp Op reel.typed/Control
+          :examples $ []
+          :schema $ quote UnionDef
         'Store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct Store
             :states $ Map Dynamic Dynamic
@@ -274,14 +283,14 @@
             match op
               (:states cursor data)
                 Op :states
-                  decode-map-as cursor $ List Dynamic
+                  decode-map-as cursor $ List respo.schema/CoordKey
                   , data
               (:content data)
                 Op :content $ decode-map-as data 'String
               (:hydrate-storage data) (Op :hydrate-storage data)
               _ $ raise $ str "|Unknown layout operation: " op
           :examples $ []
-          :schema $ quote $ Fn Enum (-> app.schema/Op)
+          :schema $ quote $ Fn AnyEnum (-> app.schema/Op)
           :tests $ [] $ %{} 'TestEntry (:name |adapts-legacy-enum-protocol)
             :code $ quote $ do
               assert= (Op :content |legacy)
