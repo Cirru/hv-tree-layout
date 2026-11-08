@@ -5,9 +5,13 @@
 
 浏览器交互通过 `:js-ffi` 中的 `js-ffi.browser` 接口访问 DOM、存储和定时器；布局数据仍由 Calcit 管理。
 
+### Calcit 0.38.0
+
+重新安装依赖、构建并刷新页面。旧 Map 和序列化 Store 继续使用 `hv-layout` 键恢复。应用在派发入口验证存档，Reel 仅记录具名 `Store`。恢复失败仍显示 HUD 提示并暂停保存。
+
 ### 本地验证
 
-使用者影响：配套正式 Calcit / `@calcit/procs` **0.37.0**、Caps 0.1.1、Node.js 24 和 Yarn 4.18.0。依赖为 Respo 0.19.5、Reel 0.10.0、Respo UI 0.15.2、JS-FFI 0.2.13 与传递 Router 0.12.2。三组布局样例的横纵交替、空分支与原存档格式保持。编辑树输入使用内置递归 `CirruNode`，与 Cirru 解析器的返回类型一致。派发区分 `Op | reel.typed/Control`，状态路径使用 `CoordKey`。安装依赖后运行：
+使用者影响：配套正式 Calcit / `@calcit/procs` **0.38.0**、Caps 0.1.1、Node.js 24 和 Yarn 4.18.0。依赖为 Respo 0.19.5、Reel 0.10.0、Respo UI 0.15.2、JS-FFI 0.2.13 与传递 Router 0.12.2。三组布局样例的横纵交替、空分支与原存档格式保持。编辑树输入使用内置递归 `CirruNode`，与 Cirru 解析器的返回类型一致。派发区分 `Op | reel.typed/Control`，状态路径使用 `CoordKey`。安装依赖后运行：
 
 ```bash
 caps --strict --ci
@@ -24,7 +28,7 @@ yarn vite build
 
 实时编译可另开终端运行 `calcit calcit.cirru js -w`，无需 concurrently。项目基于 [Calcit Workflow](https://github.com/mvc-works/calcit-workflow)，采用 MIT 许可证。
 
-默认构建使用相对路径；`VITE_BASE_URL` 可以指定前端 CDN 路径。CI 的主分支资源位于 `https://cos-sh.tiye.me/Cirru/hv-tree-layout/`，PR 使用独立的 `pr/<number>/<run>/<attempt>/` 子目录，构建、上传和公开访问校验共用同一个前缀。配置 `COS_BUCKET`、`COS_SECRET_ID`、`COS_SECRET_KEY` 后，由正式 cos-upload-action 1.2.0 的内置能力检查 HTML 同域脚本/样式引用与上传内容，不再增加项目校验脚本；Actions 使用已核对的精确正式 tag。
+默认构建使用相对路径；`VITE_BASE_URL` 可以指定前端 CDN 路径。CI 的主分支资源位于 `https://cos-sh.tiye.me/Cirru/hv-tree-layout/`，PR 使用独立的 `pr/<number>/<run>/<attempt>/` 子目录，构建、上传和公开访问校验共用同一个前缀。配置 `COS_BUCKET`、`COS_SECRET_ID`、`COS_SECRET_KEY` 后，由正式 cos-upload-action 1.3.0 的内置能力检查 HTML 同域脚本/样式引用与上传内容；Actions 使用已核对的精确正式 tag。
 
 保留已测试 artifact 的传递、上传队列、过期 HEAD 检查和原 main push 服务器部署；COS 只处理前端 `dist`，原 `dist/*` 和目标目录不变。CI 保留严格依赖/工具链、canonical、全定义与公开定义检查、质量预算、附属测试和 JS 构建，并要求完整 `fix --workflow strict --verify` 通过且 diagnostics 为空。废弃调用由已有质量预算的零上限拦截，不另加重复检查脚本。
 
