@@ -6,12 +6,12 @@
     {} (:description |) (:init-fn 'app.main/main!) (:mode :js) (:reload-fn 'app.main/reload!) (:target :browser)
       :feature-policy $ {}
       :modules $ [] |respo.calcit/ |respo-ui.calcit/ |reel.calcit/ |js-ffi/
-      :type-slots $ {} $ :dispatch-op 'app.schema/DispatchOp
+      :type-slots $ {} $ :dispatch-op 'app.schema/Op
   :files $ {}
     'app.comp.container $ %{} 'FileEntry
       :defs $ {}
         'comp-container $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defcomp comp-container (reel)
+          :code $ quote $ defcomp comp-container (reel on-control)
             let
                 store $ :store reel
                 states $ :states store
@@ -28,10 +28,12 @@
                 comp-expr-horizontal $ parse-cirru-list $ inline |bookmark-demo.cirru
                 respo.comp.space/space-y 200
                 if dev?
-                  Option :some $ comp-typed-reel (>> states :reel) reel $ {}
+                  Option :some $ comp-typed-reel (>> states :reel) reel ({}) on-control
                   Option :none
           :examples $ []
-          :schema $ quote $ Fn (reel.typed/State app.schema/Op app.schema/Store) (-> respo.schema/Component)
+          :schema $ quote $ Fn (reel.typed/State app.schema/Op app.schema/Store)
+            Fn reel.typed/Control $ -> Unit
+            -> respo.schema/Component
         'inline $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defmacro inline (path)
             read-file $ str |data/ path
@@ -157,27 +159,16 @@
         'dispatch! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch! (op)
             when config/dev? $ println |Dispatch: op
-            match (typed/decode-control op)
-              (:some control) (dispatch-resolved! control)
-              (:none)
-                dispatch-resolved! $ app.schema/decode-op op
-          :examples $ []
-          :schema $ quote $ Fn AnyEnum (-> Unit) (:features :js-ffi)
-        'dispatch-resolved! $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn dispatch-resolved! (op)
-            hint-fn $ Fn app.schema/ResolvedOp (-> Unit) (:features :js-ffi)
-            reset! *reel $ match op
-              (reel.typed/Control control) (typed/apply-control updater @*reel control)
-              (app.schema/Op action)
-                typed/record-op updater @*reel action (generate-id!) (host/now-ms)
+            reset! *reel $ typed/record-op updater @*reel op (generate-id!) (host/now-ms)
             , &unit
           :examples $ []
+          :schema $ quote $ Fn app.schema/Op (-> Unit) (:features :js-ffi)
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! ()
             println "|Running mode:" $ if config/dev? |dev |release
             render-app!
             add-watch! *reel :changes $ fn (_reel _previous) (render-app!) &unit
-            listen-devtools! |k dispatch!
+            listen-devtools! |k on-control!
             browser/add-event-listener! |beforeunload $ fn (event) (persist-storage!)
             repeat! 60 persist-storage!
             let
@@ -192,6 +183,12 @@
             .unwrap $ respo.ffi.browser/query-selector |.app
           :examples $ []
           :schema $ quote respo.dom/DomElement
+        'on-control! $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn on-control! (control)
+            reset! *reel $ typed/apply-control updater @*reel control
+            , &unit
+          :examples $ []
+          :schema $ quote $ Fn reel.typed/Control (-> Unit)
         'persist-storage! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn persist-storage! ()
             if @*storage-error? &unit $ browser/storage-set!
@@ -212,10 +209,9 @@
           :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
         'render-app! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-app! ()
-            render! mount-target (comp-container @*reel)
-              fn (op)
-                hint-fn $ Fn AnyEnum $ -> Unit
-                if (enum? op) (dispatch! op) (raise "|Expected a layout operation enum")
+            render-with! mount-target
+              fn () $ comp-container @*reel on-control!
+              , dispatch!
           :examples $ []
           :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
         'repeat! $ %{} 'CodeEntry (:doc |)
@@ -233,7 +229,7 @@
           :code $ quote $ defn restore-storage! (raw)
             try
               do
-                dispatch! $ :: :hydrate-storage $ parse-cirru-edn raw
+                dispatch! $ app.schema/Op :hydrate-storage $ app.schema/decode-store (parse-cirru-edn raw)
                 reset! *storage-error? false
                 , &unit
               fn (message) (reset! *storage-error? true)
@@ -244,7 +240,7 @@
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.main
           :require
-            respo.core :refer $ render! clear-cache!
+            respo.core :refer $ render-with! clear-cache!
             app.comp.container :refer $ comp-container
             app.updater :refer $ updater
             app.schema :refer $ Store store
@@ -257,10 +253,6 @@
             js-ffi.shared :as host
     'app.schema $ %{} 'FileEntry
       :defs $ {}
-        'DispatchOp $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ def DispatchOp (:: :content |)
-          :examples $ []
-          :schema $ quote AnyEnum
         'Op $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defenum Op
             :states (List respo.schema/CoordKey) Dynamic
@@ -268,10 +260,6 @@
             :hydrate-storage app.schema/Store
           :examples $ []
           :schema $ quote EnumDef
-        'ResolvedOp $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defunion ResolvedOp Op reel.typed/Control
-          :examples $ []
-          :schema $ quote UnionDef
         'Store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct Store
             :states $ Map Dynamic Dynamic
@@ -288,9 +276,7 @@
               (:content data)
                 Op :content $ decode-map-as data 'String
               (:hydrate-storage data)
-                Op :hydrate-storage $ decode-map-as
-                  if (struct? data) (&struct:to-map data) data
-                  , app.schema/Store
+                Op :hydrate-storage $ decode-store data
               _ $ raise $ str "|Unknown layout operation: " op
           :examples $ []
           :schema $ quote $ Fn AnyEnum (-> app.schema/Op)
@@ -304,6 +290,13 @@
                   , false
                 fn (_error) true
             :tags $ #{} :regression :unit
+        'decode-store $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn decode-store (data)
+            decode-map-as
+              if (struct? data) (&struct:to-map data) data
+              , app.schema/Store
+          :examples $ []
+          :schema $ quote $ Fn T (-> app.schema/Store) (:generics T)
         'store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def store
             Store :states ({}) :content |
