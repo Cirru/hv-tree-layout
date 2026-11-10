@@ -262,34 +262,10 @@
           :schema $ quote EnumDef
         'Store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defstruct Store
-            :states $ Map Dynamic Dynamic
+            :states $ Map respo.schema/CoordKey Dynamic
             :content String
           :examples $ []
           :schema $ quote StructDef
-        'decode-op $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn decode-op (op)
-            match op
-              (:states cursor data)
-                Op :states
-                  decode-map-as cursor $ List respo.schema/CoordKey
-                  , data
-              (:content data)
-                Op :content $ decode-map-as data 'String
-              (:hydrate-storage data)
-                Op :hydrate-storage $ decode-store data
-              _ $ raise $ str "|Unknown layout operation: " op
-          :examples $ []
-          :schema $ quote $ Fn AnyEnum (-> app.schema/Op)
-          :tests $ [] $ %{} 'TestEntry (:name |adapts-legacy-enum-protocol)
-            :code $ quote $ do
-              assert= (Op :content |legacy)
-                decode-op $ :: :content |legacy
-              assert= true $ try
-                do
-                  decode-op $ :: :content 31
-                  , false
-                fn (_error) true
-            :tags $ #{} :regression :unit
         'decode-store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn decode-store (data)
             decode-map-as
@@ -297,6 +273,21 @@
               , app.schema/Store
           :examples $ []
           :schema $ quote $ Fn T (-> app.schema/Store) (:generics T)
+          :tests $ [] $ %{} 'TestEntry (:name |checks-legacy-storage-content)
+            :code $ quote $ do
+              assert=
+                Store :states ({}) :content |legacy
+                decode-store $ {}
+                  :states $ {}
+                  :content |legacy
+              assert= true $ try
+                do
+                  decode-store $ {}
+                    :states $ {}
+                    :content 31
+                  , false
+                fn (_error) true
+            :tags $ #{} :regression :unit
         'store $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def store
             Store :states ({}) :content |
@@ -312,7 +303,7 @@
               (:states cursor s)
                 assoc store :states $ decode-map-as
                   respo.cursor/update-state-tree (:states store) cursor s
-                  Map Dynamic Dynamic
+                  Map respo.schema/CoordKey Dynamic
               (:content data) (assoc store :content data)
               (:hydrate-storage data) data
               _ $ do (println "|unknown op:" op) store
@@ -324,7 +315,7 @@
                 app.schema/Store :states ({}) :content |restored
                 updater
                   app.schema/Store :states ({}) :content |old
-                  app.schema/decode-op $ :: :hydrate-storage $ parse-cirru-edn
+                  app.schema/Op :hydrate-storage $ app.schema/decode-store $ parse-cirru-edn
                     format-cirru-edn $ app.schema/Store :states ({}) :content |restored
                   , |test 0
               :tags $ #{} :storage :unit
