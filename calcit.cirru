@@ -28,8 +28,8 @@
                 comp-expr-horizontal $ parse-cirru-list $ inline |bookmark-demo.cirru
                 respo.comp.space/space-y 200
                 if dev?
-                  Option :some $ comp-typed-reel (>> states :reel) reel ({}) on-control
-                  Option :none
+                  Some $ comp-typed-reel (>> states :reel) reel ({}) on-control
+                  , None
           :examples $ []
           :schema $ quote $ Fn (reel.typed/State app.schema/Op app.schema/Store)
             Fn reel.typed/Control $ -> Unit
@@ -84,7 +84,7 @@
                     (List branch)
                       if (empty? branch) (comp-empty) (comp-expr-vertical branch)
           :examples $ []
-          :schema $ quote $ Fn (List calcit.core/CirruNode) (-> respo.schema/Component)
+          :schema $ quote $ Fn (List CirruNode) (-> respo.schema/Component)
         'comp-expr-vertical $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-expr-vertical (expr)
             let
@@ -108,7 +108,7 @@
                     (List branch)
                       if (empty? branch) (comp-empty) (comp-expr-horizontal branch)
           :examples $ []
-          :schema $ quote $ Fn (List calcit.core/CirruNode) (-> respo.schema/Component)
+          :schema $ quote $ Fn (List CirruNode) (-> respo.schema/Component)
         'comp-leaf $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-leaf (text)
             div
@@ -149,9 +149,9 @@
       :defs $ {}
         '*reel $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defref *reel
-            typed/State :base store :store store :records ([]) :pointer (Option :none) :stopped? false :display? false :merged? false
+            typed/State :base store :store store :records ([]) :pointer None :stopped? false :display? false :merged? false
           :examples $ []
-          :schema $ quote $ Ref (reel.typed/State app.schema/Op app.schema/Store)
+          :schema $ quote $ Ref (typed/State app.schema/Op Store)
         '*storage-error? $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defref *storage-error? false
           :examples $ []
@@ -188,7 +188,7 @@
             reset! *reel $ typed/apply-control updater @*reel control
             , &unit
           :examples $ []
-          :schema $ quote $ Fn reel.typed/Control (-> Unit)
+          :schema $ quote $ Fn typed/Control (-> Unit)
         'persist-storage! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn persist-storage! ()
             if @*storage-error? &unit $ browser/storage-set!
@@ -272,7 +272,7 @@
               if (struct? data) (&struct:to-map data) data
               , app.schema/Store
           :examples $ []
-          :schema $ quote $ Fn T (-> app.schema/Store) (:generics T)
+          :schema $ quote $ Fn T (-> Store) (:generics T)
           :tests $ [] $ %{} 'TestEntry (:name |checks-legacy-storage-content)
             :code $ quote $ do
               assert=
@@ -292,7 +292,7 @@
           :code $ quote $ def store
             Store :states ({}) :content |
           :examples $ []
-          :schema $ quote app.schema/Store
+          :schema $ quote Store
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.schema
     'app.updater $ %{} 'FileEntry
@@ -332,10 +332,10 @@
                     , |root 2
                 assert= (Result :ok false)
                   get-in (:states nested) ([] :viewer |mixed 7 :data)
-                assert= (Option :some 31)
+                assert= (Some 31)
                   get (:states root) |legacy
                 assert= false $ contains? (:states root) :states
-                assert= (Option :some |root)
+                assert= (Some |root)
                   get (:states root) :data
                 assert= |keep $ :content root
               :tags $ #{} :regression :unit
