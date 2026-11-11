@@ -77,7 +77,7 @@
                 {} $ :style $ .merge ui/row
                   if nested-head? (assoc style :padding-left 32) style
                 map-indexed expr $ fn (idx child)
-                  hint-fn $ Fn Number calcit.core/CirruNode $ -> respo.schema/ChildPair
+                  hint-fn $ Fn Number CirruNode $ -> respo.schema/ChildPair
                   respo.util.detect/make-child-pair idx $ match child
                     (String token)
                       div ({}) (comp-leaf token)
@@ -101,7 +101,7 @@
                 {} $ :style $ .merge ui/column
                   if nested-head? (assoc style :padding-top 32) style
                 map-indexed expr $ fn (idx child)
-                  hint-fn $ Fn Number calcit.core/CirruNode $ -> respo.schema/ChildPair
+                  hint-fn $ Fn Number CirruNode $ -> respo.schema/ChildPair
                   respo.util.detect/make-child-pair idx $ match child
                     (String token)
                       div ({}) (comp-leaf token)

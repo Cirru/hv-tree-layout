@@ -5,13 +5,13 @@
 
 浏览器交互通过 `:js-ffi` 中的 `js-ffi.browser` 接口访问 DOM、存储和定时器；布局数据仍由 Calcit 管理。
 
-### Calcit 0.41.0
+### Calcit 0.41.1
 
 重新安装依赖、构建并刷新页面。旧 Map 和序列化 Store 继续使用 `hv-layout` 键恢复。应用在读取边界验证存档，再用具名 `Op` 记录恢复。恢复失败仍显示 HUD 提示并暂停保存。
 
 ### 本地验证
 
-配套正式 Calcit / `@calcit/procs` **0.41.0**、Caps 0.1.1、Node.js 24 和 Yarn 4.18.0。依赖为 Respo 0.19.5、Reel 0.11.0、Respo UI 0.15.2、JS-FFI 0.2.13 与传递 Router 0.12.2。三组布局样例的横纵交替、空分支与原存档格式保持。编辑树输入使用内置递归 `CirruNode`，与 Cirru 解析器的返回类型一致。应用派发接收 `Op`，面板和快捷键接收独立的 `reel.typed/Control`，状态路径使用 `CoordKey`。安装依赖后运行：
+配套正式 Calcit / `@calcit/procs` **0.41.1**、Caps 0.1.1、Node.js 24 和 Yarn 4.18.0。依赖为 Respo 0.19.5、Reel 0.11.0、Respo UI 0.15.2、JS-FFI 0.2.13 与传递 Router 0.12.2。三组布局样例的横纵交替、空分支与原存档格式保持。编辑树输入使用内置递归 `CirruNode`，与 Cirru 解析器的返回类型一致。应用派发接收 `Op`，面板和快捷键接收独立的 `reel.typed/Control`，状态路径使用 `CoordKey`。安装依赖后运行：
 
 ```bash
 caps --strict --ci
