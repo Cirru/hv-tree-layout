@@ -11,7 +11,7 @@
 
 ### 本地验证
 
-配套正式 Calcit / `@calcit/procs` **0.44.0**、Caps 0.1.1、Node.js 24 和 Yarn 4.18.0。直接依赖为 Respo 0.19.11、Reel 0.11.3、Respo UI 0.15.5 和 JS-FFI 0.2.18；严格解析的传递 Router 为 0.12.9。三组布局样例的横纵交替、空分支与原存档格式保持。编辑树输入使用内置递归 `CirruNode`，与 Cirru 解析器的返回类型一致。应用派发接收 `Op`，面板和快捷键接收独立的 `reel.typed/Control`，状态路径使用 `CoordKey`。安装依赖后运行：
+配套正式 Calcit / `@calcit/procs` **0.44.0**、Caps 0.1.1、Node.js 24 和 Yarn 4.18.0。直接依赖为 Respo 0.19.13、Reel 0.11.5、Respo UI 0.15.7 和 JS-FFI 0.2.19；严格解析的传递 Router 为 0.12.11。三组布局样例的横纵交替、空分支与原存档格式保持。编辑树输入使用内置递归 `CirruNode`，与 Cirru 解析器的返回类型一致。应用派发接收 `Op`，面板和快捷键接收独立的 `reel.typed/Control`，状态路径使用 `CoordKey`。安装依赖后运行：
 
 ```bash
 caps --strict --ci
