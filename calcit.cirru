@@ -12,24 +12,21 @@
       :defs $ {}
         'comp-container $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-container (reel on-control)
-            let
-                store $ :store reel
-                states $ :states store
-              div
-                {} $ :style $ .merge ui/global
-                  {}
-                    :color $ hsl 0 0 100
-                    :padding 16
-                div ({})
-                  comp-expr-horizontal $ parse-cirru-list $ inline |page-demo.cirru
-                respo.comp.space/space-y 200
-                comp-expr-horizontal $ parse-cirru-list $ inline |updater-demo.cirru
-                respo.comp.space/space-y 200
-                comp-expr-horizontal $ parse-cirru-list $ inline |bookmark-demo.cirru
-                respo.comp.space/space-y 200
-                if dev?
-                  Some $ comp-typed-reel (>> states :reel) reel ({}) on-control
-                  , None
+            div
+              {} $ :style $ .merge ui/global
+                {}
+                  :color $ hsl 0 0 100
+                  :padding 16
+              div ({})
+                comp-expr-horizontal $ parse-cirru-list $ inline |page-demo.cirru
+              respo.comp.space/space-y 200
+              comp-expr-horizontal $ parse-cirru-list $ inline |updater-demo.cirru
+              respo.comp.space/space-y 200
+              comp-expr-horizontal $ parse-cirru-list $ inline |bookmark-demo.cirru
+              respo.comp.space/space-y 200
+              if dev?
+                Some $ comp-controlled-reel reel ({}) on-control
+                , None
           :examples $ []
           :schema $ quote $ Fn (reel.typed/State app.schema/Op app.schema/Store)
             Fn reel.typed/Control (-> Unit) (:features :io :state)
@@ -47,9 +44,9 @@
           :require
             respo.util.format :refer $ hsl
             respo-ui.core :as ui
-            respo.core :refer $ defcomp defeffect >> <> div button textarea span input
+            respo.core :refer $ defcomp defeffect <> div button textarea span input
             respo.comp.space :refer $ =<
-            reel.comp.reel :refer $ comp-typed-reel
+            reel.comp.reel :refer $ comp-controlled-reel
             app.config :refer $ dev?
             app.comp.expr :refer $ comp-expr-horizontal
     'app.comp.expr $ %{} 'FileEntry
